@@ -10,6 +10,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    // MARK: - displayLabel
+    
     @IBOutlet weak var displayLabel: UILabel!
     
     private var isFinishedTyping: Bool = true
@@ -22,24 +24,32 @@ class ViewController: UIViewController {
             }
             return number
         }
+        
+        set {
+            displayLabel.text = String(newValue)
+        }
     }
+    
+    // MARK: - calcBUttonPressed
     
     @IBAction func calcButtonPressed(_ sender: UIButton) {
         
         isFinishedTyping = true
-
+        
         if let calcMethod = sender.currentTitle {
-            if calcMethod == "+/-" {
-                displayLabel.text = String(displayValue * -1)
-            } else if calcMethod == "AC" {
-                displayLabel.text = "0"
-            } else if calcMethod == "%" {
-                displayLabel.text = String(displayValue / 100)
+            let calculator = CalculatorLogic(number: displayValue)
+            
+            guard let result = calculator.calculate(symbol: calcMethod) else {
+                fatalError("The result of the calculation is nil.")
             }
+            displayValue = result
         }
+        
     
     }
 
+ 
+    // MARK: - numButtonPressed
     
     @IBAction func numButtonPressed(_ sender: UIButton) {
         
@@ -50,12 +60,8 @@ class ViewController: UIViewController {
             } else {
                 
                 if numValue == "." {
-                    
-                    guard let currentDisplayValue = Double(displayLabel.text!) else {
-                        fatalError("Cannot convert displayLable.text to a Double")
-                    }
 
-                    let isInt = floor(currentDisplayValue) == currentDisplayValue
+                    let isInt = floor(displayValue) == displayValue
                     
                     if !isInt {
                         return
